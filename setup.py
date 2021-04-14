@@ -3,7 +3,6 @@ import csv
 
 db = Database()
 db.bind(provider='mysql', user='root', password='statracker1', host='127.0.0.1', db='internet')
-# db.drop_all_tables()
 
 class Flow(db.Entity):
     id = PrimaryKey(int, auto=True)
@@ -53,22 +52,22 @@ db.generate_mapping(create_tables=True)
 
 @db_session
 def populate_db():
-    # p1 = Protocol(id=1, name='ICMP')
-    # p2 = Protocol(id=6, name='TCP')
-    # p3 = Protocol(id=17, name='UDP')
-    #
-    # er0 = EndReason(id=0, description='inactive timeout expired')
-    # er1 = EndReason(id=1, description='active timeout expired')
-    # er2 = EndReason(id=2, description='forced expiration due to end of pcap file or live captured stopped')
-    # er3 = EndReason(id=3, description='FIN flag detected on both directions')
-    # er4 = EndReason(id=4, description='RST flag detected')
-    # er5 = EndReason(id=5, description='FIN Flag detected on one direction only and timer expired')
+    # Initial data for frist load
+    p1 = Protocol(id=1, name='ICMP')
+    p2 = Protocol(id=6, name='TCP')
+    p3 = Protocol(id=17, name='UDP')
+    er0 = EndReason(id=0, description='inactive timeout expired')
+    er1 = EndReason(id=1, description='active timeout expired')
+    er2 = EndReason(id=2, description='forced expiration due to end of pcap file or live captured stopped')
+    er3 = EndReason(id=3, description='FIN flag detected on both directions')
+    er4 = EndReason(id=4, description='RST flag detected')
+    er5 = EndReason(id=5, description='FIN Flag detected on one direction only and timer expired')
 
     row_number = 0
     with open('dataset.csv') as csvfile:
         reader = csv.reader(csvfile, delimiter=',', quotechar='|')
         for row in reader:
-            if row_number > 10:
+            if row_number > 0:
                 # NetworkNode
                 src_ip = row[2]
                 src_port = row[3]
@@ -99,7 +98,8 @@ def populate_db():
                 else:
                     temp_flow.end_reason_id = end_reason
             row_number += 1
-            if row_number > 1000:
-                break
+            # Use to limit number of rows inserted
+            # if row_number > 1000:
+            #     break
 
 populate_db()
